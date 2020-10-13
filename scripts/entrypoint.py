@@ -50,7 +50,7 @@ def generate_openid_keys(passwd, jks_path, jwks_path, dn, exp=365, sig_keys=DEFA
     cmd = " ".join([
         "java",
         "-Dlog4j.defaultInitOverride=true",
-        "-jar", "/app/javalibs/oxauth-client.jar",
+        "-jar", "/app/javalibs/janssen-client.jar",
         "-enc_keys", enc_keys,
         "-sig_keys", sig_keys,
         "-dnname", "{!r}".format(dn),
@@ -69,8 +69,8 @@ def export_openid_keys(keystore, keypasswd, alias, export_file):
     cmd = " ".join([
         "java",
         "-Dlog4j.defaultInitOverride=true",
-        "-cp /app/javalibs/oxauth-client.jar",
-        "org.gluu.oxauth.util.KeyExporter",
+        "-cp /app/javalibs/janssen-client.jar",
+        "io.jans.janssen.util.KeyExporter",
         "-keystore {}".format(keystore),
         "-keypasswd {}".format(keypasswd),
         "-alias {}".format(alias),

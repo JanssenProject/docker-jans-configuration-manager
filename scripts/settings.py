@@ -23,8 +23,4 @@ LOGGING_CONFIG = {
             "propagate": False,
         },
     },
-    # "root": {
-    #     "level": "INFO",
-    #     "handlers": ["console"],
-    # },
 }
