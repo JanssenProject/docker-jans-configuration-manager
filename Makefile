@@ -1,5 +1,5 @@
 JANS_VERSION=5.0.0
-IMAGE_NAME=janssenproject/config-initializer
+IMAGE_NAME=janssenproject/configuration-manager
 UNSTABLE_VERSION=dev
 
 build-dev:

@@ -110,18 +110,17 @@ ENV JANS_OVERWRITE_ALL=false \
 # misc
 # ====
 
-LABEL name="Config Initializer" \
+LABEL name="configuration-manager" \
     maintainer="Janssen <support@jans.io>" \
     vendor="Janssen" \
     version="5.0.0" \
     release="dev" \
-    summary="Janssen Config Initializer" \
+    summary="Janssen Configuration Manager" \
     description="Manage config and secret"
 
 COPY scripts /app/scripts
 RUN mkdir -p /etc/certs /app/db \
-    && chmod +x /app/scripts/entrypoint.sh \
-    && ln -s /app /opt/config-init
+    && chmod +x /app/scripts/entrypoint.sh
 
 ENTRYPOINT ["tini", "-g", "--", "sh", "/app/scripts/entrypoint.sh"]
 CMD ["--help"]
