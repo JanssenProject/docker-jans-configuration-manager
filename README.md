@@ -1,11 +1,11 @@
 ## Overview
 
-ConfigInit is a special container used to load (generate/restore) and dump (backup) the configuration and secrets.
+Configuration manager is a special container used to load (generate/restore) and dump (backup) the configuration and secrets.
 
 ## Versions
 
-See [Releases](https://github.com/JanssenProject/docker-jans-configuration-initializer/releases) for stable versions.
-For bleeding-edge/unstable version, use `janssenproject/config-initializer:5.0.0_dev`.
+See [Releases](https://github.com/JanssenProject/docker-jans-configuration-manager/releases) for stable versions.
+For bleeding-edge/unstable version, use `janssenproject/configurtaion-manager:5.0.0_dev`.
 
 ## Environment Variables
 
@@ -115,7 +115,7 @@ The load command can be used either to generate or restore config and secret for
 	apiVersion: batch/v1
 	kind: Job
 	metadata:
-	  name: config-init-load-job
+	  name: configuration-manager-load-job
 	spec:
 	  template:
 	    spec:
@@ -125,8 +125,8 @@ The load command can be used either to generate or restore config and secret for
 	          configMap:
 	            name: config-generate-params
 	      containers:
-	        - name: config-init-load
-	          image: gluufederation/config-init:4.2.1_02
+	        - name: configuration-manager-load
+	          image: janssenproject/configurtaion-manager:5.0.0_dev
 	          volumeMounts:
 	            - mountPath: /opt/config-init/db/generate.json
 	              name: config-generate-params
@@ -152,7 +152,7 @@ The load command can be used either to generate or restore config and secret for
 	apiVersion: batch/v1
 	kind: Job
 	metadata:
-	  name: config-init-load-job
+	  name: configuration-manager-load-job
 	spec:
 	  template:
 	    spec:
@@ -165,8 +165,8 @@ The load command can be used either to generate or restore config and secret for
 	          configMap:
 	            name: secret-params
 	      containers:
-	        - name: config-init-load
-	          image: gluufederation/config-init:4.2.1_02
+	        - name: configuration-manager-load
+	          image: janssenproject/configurtaion-manager:5.0.0_dev
 	          volumeMounts:
 	            - mountPath: /opt/config-init/db/config.json
 	              name: config-params
@@ -200,7 +200,7 @@ docker run \
     -v /path/to/host/volume:/opt/config-init/db \
     -v /path/to/vault_role_id.txt:/etc/certs/vault_role_id \
     -v /path/to/vault_secret_id.txt:/etc/certs/vault_secret_id \
-    gluufederation/config-init:4.2.1_02 dump
+    janssenproject/configurtaion-manager:5.0.0_dev dump
 ```
 
 #### Kubernetes
@@ -209,14 +209,14 @@ docker run \
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: config-init-load-job
+  name: configuration-manager-dump-job
 spec:
   template:
     spec:
       restartPolicy: Never
       containers:
-        - name: config-init-load
-          image: gluufederation/config-init:4.2.1_02
+        - name: configuration-manager-dump-job
+          image: janssenproject/configurtaion-manager:5.0.0_dev
           command:
             - /bin/sh
             - -c
