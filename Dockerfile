@@ -21,7 +21,7 @@ RUN apk update \
 ENV JANS_VERSION=5.0.0-SNAPSHOT
 ENV JANS_BUILD_DATE="2020-10-02 11:56"
 
-# @TODO: this package is deprecated; should downloads all required JARs from janssen-server
+# @TODO: this package is deprecated; should downloads all required JARs from jans-auth-server.war
 RUN mkdir -p /app/javalibs \
     && wget -q https://ox.gluu.org/maven/org/janssen/janssen-client/${JANS_VERSION}/janssen-client-${JANS_VERSION}-jar-with-dependencies.jar -O /app/javalibs/janssen-client.jar
 
@@ -76,7 +76,7 @@ ENV JANS_CONFIG_ADAPTER=consul \
     JANS_CONFIG_CONSUL_TOKEN_FILE=/etc/certs/consul_token \
     JANS_CONFIG_CONSUL_NAMESPACE=jans \
     JANS_CONFIG_KUBERNETES_NAMESPACE=default \
-    JANS_CONFIG_KUBERNETES_CONFIGMAP=janssen \
+    JANS_CONFIG_KUBERNETES_CONFIGMAP=jans \
     JANS_CONFIG_KUBERNETES_USE_KUBE_CONFIG=false
 
 # ==========
@@ -95,7 +95,7 @@ ENV JANS_SECRET_ADAPTER=vault \
     JANS_SECRET_VAULT_CACERT_FILE=/etc/certs/vault_ca.crt \
     JANS_SECRET_VAULT_NAMESPACE=jans \
     JANS_SECRET_KUBERNETES_NAMESPACE=default \
-    JANS_SECRET_KUBERNETES_SECRET=janssen \
+    JANS_SECRET_KUBERNETES_SECRET=jans \
     JANS_SECRET_KUBERNETES_USE_KUBE_CONFIG=false
 
 # ===========
@@ -104,7 +104,8 @@ ENV JANS_SECRET_ADAPTER=vault \
 
 ENV JANS_OVERWRITE_ALL=false \
     JANS_WAIT_MAX_TIME=300 \
-    JANS_WAIT_SLEEP_DURATION=10
+    JANS_WAIT_SLEEP_DURATION=10 \
+    JANS_NAMESPACE=jans
 
 # ====
 # misc

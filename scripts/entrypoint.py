@@ -70,7 +70,7 @@ def export_openid_keys(keystore, keypasswd, alias, export_file):
         "java",
         "-Dlog4j.defaultInitOverride=true",
         "-cp /app/javalibs/janssen-client.jar",
-        "io.jans.janssen.util.KeyExporter",
+        "org.gluu.oxauth.util.KeyExporter",
         "-keystore {}".format(keystore),
         "-keypasswd {}".format(keypasswd),
         "-alias {}".format(alias),
@@ -724,10 +724,10 @@ class CtxGenerator(object):
         self._set_secret("api_test_client_secret", get_random_chars(24))
 
     def radius_ctx(self):
-        self._set_config("gluu_radius_client_id", '1701.{}'.format(uuid.uuid4()))
-        # self._set_config("ox_radius_client_id", '0008-{}'.format(uuid.uuid4()))
+        namespace = os.environ.get("JANS_NAMESPACE", "jans")
+        self._set_config(f"{namespace}_radius_client_id", '1701.{}'.format(uuid.uuid4()))
         self._set_secret(
-            "gluu_ro_encoded_pw",
+            f"{namespace}_ro_encoded_pw",
             encode_text(get_random_chars(), self.ctx["secret"]["encoded_salt"]),
         )
 
@@ -739,12 +739,12 @@ class CtxGenerator(object):
 
         out, err, code = generate_openid_keys(
             radius_jwt_pass,
-            "/etc/certs/gluu-radius.jks",
-            "/etc/certs/gluu-radius.keys",
+            "/etc/certs/jans-radius.jks",
+            "/etc/certs/jans-radius.keys",
             self.ctx["config"]["default_openid_jks_dn_name"],
         )
         if code != 0:
-            logger.error("Unable to generate Gluu Radius keys; reason={}".format(err))
+            logger.error("Unable to generate Radius keys; reason={}".format(err))
             raise click.Abort()
 
         for key in json.loads(out)["keys"]:
@@ -752,15 +752,15 @@ class CtxGenerator(object):
                 self.ctx["config"]["radius_jwt_keyId"] = key["kid"]
                 break
 
-        with open("/etc/certs/gluu-radius.jks", "rb") as fr:
+        with open("/etc/certs/jans-radius.jks", "rb") as fr:
             self._set_secret(
                 "radius_jks_base64",
                 encode_text(fr.read(), self.ctx["secret"]["encoded_salt"])
             )
 
-        basedir, fn = os.path.split("/etc/certs/gluu-radius.keys")
+        basedir, fn = os.path.split("/etc/certs/jans-radius.keys")
         self._set_secret(
-            "gluu_ro_client_base64_jwks",
+            f"{namespace}_ro_client_base64_jwks",
             encode_template(fn, self.ctx, basedir),
         )
 
@@ -780,7 +780,6 @@ class CtxGenerator(object):
     def generate(self):
         self.base_ctx()
         self.nginx_ctx()
-        # raise click.Abort()
         self.ldap_ctx()
         self.redis_ctx()
         self.oxauth_ctx()
