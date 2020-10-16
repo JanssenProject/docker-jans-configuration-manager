@@ -39,7 +39,6 @@ The following environment variables are supported by the container:
 - `JANS_SECRET_KUBERNETES_USE_KUBE_CONFIG`: Load credentials from `$HOME/.kube/config`, only useful for non-container environment (default to `false`).
 - `JANS_WAIT_MAX_TIME`: How long the startup "health checks" should run (default to `300` seconds).
 - `JANS_WAIT_SLEEP_DURATION`: Delay between startup "health checks" (default to `10` seconds).
-- `JANS_OVERWRITE_ALL`: Overwrite all config (default to `false`).
 
 ## Commands
 

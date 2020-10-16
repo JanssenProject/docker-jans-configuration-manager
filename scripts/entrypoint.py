@@ -14,7 +14,6 @@ from jans.pycloudlib.utils import get_random_chars
 from jans.pycloudlib.utils import get_sys_random_chars
 from jans.pycloudlib.utils import encode_text
 from jans.pycloudlib.utils import exec_cmd
-from jans.pycloudlib.utils import as_boolean
 from jans.pycloudlib.utils import generate_base64_contents
 from jans.pycloudlib.utils import safe_render
 from jans.pycloudlib.utils import ldap_encode
@@ -99,49 +98,13 @@ class CtxManager:
     def __init__(self, manager):
         self.manager = manager
         self.ctx = {"config": {}, "secret": {}}
-        self._remote_config_ctx = None
-        self._remote_secret_ctx = None
-
-    @property
-    def remote_config_ctx(self):
-        if not self._remote_config_ctx:
-            self._remote_config_ctx = self.manager.config.all()
-        return self._remote_config_ctx
-
-    @property
-    def remote_secret_ctx(self):
-        if not self._remote_secret_ctx:
-            self._remote_secret_ctx = self.manager.secret.all()
-        return self._remote_secret_ctx
 
     def set_config(self, key, value):
-        if as_boolean(os.environ.get("JANS_OVERWRITE_ALL", False)):
-            logger.info("updating config {!r}".format(key))
-            self.ctx["config"][key] = value
-            return value
-
-        # check existing key first
-        if key in self.remote_config_ctx:
-            logger.info("ignoring config {!r}".format(key))
-            self.ctx["config"][key] = value = self.remote_config_ctx[key]
-            return value
-
         logger.info(f"adding config {key}")
         self.ctx["config"][key] = value
         return value
 
     def set_secret(self, key, value):
-        if as_boolean(os.environ.get("JANS_OVERWRITE_ALL", False)):
-            logger.info("updating secret {!r}".format(key))
-            self.ctx["secret"][key] = value
-            return value
-
-        # check existing key first
-        if key in self.remote_secret_ctx:
-            logger.info("ignoring secret {!r}".format(key))
-            self.ctx["secret"][key] = value = self.remote_secret_ctx[key]
-            return value
-
         logger.info(f"adding secret {key}")
         self.ctx["secret"][key] = value
         return value
@@ -530,8 +493,7 @@ class CtxGenerator:
                     # or generate empty file
                     with open(ssl_key, "w") as f:
                         f.write("")
-            except (socket.gaierror, socket.timeout, ConnectionRefusedError,
-                    TimeoutError, ConnectionResetError) as exc:
+            except (socket.gaierror, socket.timeout, OSError) as exc:
                 # address not resolved or timed out
                 logger.warning(f"Unable to download cert; reason={exc}")
             finally:
@@ -1010,41 +972,38 @@ def load(generate_file, config_file, secret_file):
     deps = ["config_conn", "secret_conn"]
     wait_for(manager, deps=deps)
 
-    config_file_found = os.path.isfile(config_file)
-    secret_file_found = os.path.isfile(secret_file)
-    should_generate = False
-    params = {}
-
-    if not any([config_file_found, secret_file_found]):
-        should_generate = True
-        logger.warning("Unable to find {0} or {1}".format(config_file, secret_file))
-
-        logger.info("Loading parameters from {}".format(generate_file))
-
-        params, err, code = params_from_file(generate_file)
-        if code != 0:
-            logger.error("Unable to load generate parameters; reason={}".format(err))
-            raise click.Abort()
-
-    if should_generate:
-        logger.info("Generating config and secret.")
-
-        # tolerancy before checking existing key
-        time.sleep(5)
-
-        ctx_generator = CtxGenerator(manager, params)
-        ctx = ctx_generator.generate()
-
-        _save_generated_ctx(manager, ctx["config"], "config")
-        _dump_to_file(manager, config_file, "config")
-
-        _save_generated_ctx(manager, ctx["secret"], "secret")
-        _dump_to_file(manager, secret_file, "secret")
+    # check whether config and secret in backend have been initialized
+    if manager.config.get("hostname") and manager.secret.get("ssl_cert"):
+        # config and secret may have been initialized
+        logger.info("Config and secret have been initialized")
         return
 
-    # load from existing files
-    _load_from_file(manager, config_file, "config")
-    _load_from_file(manager, secret_file, "secret")
+    # there's no config and secret in backend, check whether to load from files
+    if os.path.isfile(config_file) and os.path.isfile(secret_file):
+        # load from existing files
+        logger.info(f"Re-using config and secret from {config_file} and {secret_file}")
+        _load_from_file(manager, config_file, "config")
+        _load_from_file(manager, secret_file, "secret")
+        return
+
+    # no existing files, hence generate new config and secret from parameters
+    logger.info(f"Loading parameters from {generate_file}")
+    params, err, code = params_from_file(generate_file)
+    if code != 0:
+        logger.error(f"Unable to load parameters; reason={err}")
+        raise click.Abort()
+
+    logger.info("Generating new config and secret")
+    ctx_generator = CtxGenerator(manager, params)
+    ctx = ctx_generator.generate()
+
+    # save config to its backend and file
+    _save_generated_ctx(manager, ctx["config"], "config")
+    _dump_to_file(manager, config_file, "config")
+
+    # save secret to its backend and file
+    _save_generated_ctx(manager, ctx["secret"], "secret")
+    _dump_to_file(manager, secret_file, "secret")
 
 
 @cli.command()
