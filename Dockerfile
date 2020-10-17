@@ -13,25 +13,24 @@ RUN apk update \
     && apk add --no-cache openssl py3-pip curl tini \
     && apk add --no-cache --virtual build-deps wget git
 
-# ==============
-# Janssen client
-# ==============
-
-# JAR files required to generate OpenID Connect keys
-ENV JANS_VERSION=5.0.0-SNAPSHOT
-ENV JANS_BUILD_DATE="2020-10-02 11:56"
+# ===========
+# Auth client
+# ===========
 
 # @TODO: this package is deprecated; should downloads all required JARs from jans-auth-server.war
-RUN mkdir -p /app/javalibs \
-    && wget -q https://ox.gluu.org/maven/org/janssen/janssen-client/${JANS_VERSION}/janssen-client-${JANS_VERSION}-jar-with-dependencies.jar -O /app/javalibs/janssen-client.jar
+# JAR files required to generate OpenID Connect keys
+ENV JANS_VERSION=5.0.0-SNAPSHOT
+ENV JANS_BUILD_DATE="2020-10-17 19:42"
+ENV JANS_SOURCE_URL=https://maven.jans.io/maven/io/jans/jans-auth-client/${JANS_VERSION}/jans-auth-client-${JANS_VERSION}-jar-with-dependencies.jar
 
+RUN wget -q ${JANS_SOURCE_URL} -P /app/javalibs/
+#
 # =================
 # Shibboleth sealer
 # =================
 
 # @TODO: remove them?
-RUN mkdir -p /app/javalibs \
-    && wget -q https://build.shibboleth.net/nexus/content/repositories/releases/net/shibboleth/utilities/java-support/7.5.1/java-support-7.5.1.jar -P /app/javalibs/ \
+RUN wget -q https://build.shibboleth.net/nexus/content/repositories/releases/net/shibboleth/utilities/java-support/7.5.1/java-support-7.5.1.jar -P /app/javalibs/ \
     && wget -q https://repo1.maven.org/maven2/com/beust/jcommander/1.48/jcommander-1.48.jar -P /app/javalibs/ \
     && wget -q https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.26/slf4j-api-1.7.26.jar -P /app/javalibs/ \
     && wget -q https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/1.7.26/slf4j-simple-1.7.26.jar -P /app/javalibs/

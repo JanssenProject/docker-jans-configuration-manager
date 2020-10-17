@@ -49,7 +49,8 @@ def generate_openid_keys(passwd, jks_path, jwks_path, dn, exp=365, sig_keys=DEFA
     cmd = " ".join([
         "java",
         "-Dlog4j.defaultInitOverride=true",
-        "-jar", "/app/javalibs/janssen-client.jar",
+        "-cp /app/javalibs/*",
+        "io.jans.as.client.util.KeyGenerator",
         "-enc_keys", enc_keys,
         "-sig_keys", sig_keys,
         "-dnname", "{!r}".format(dn),
@@ -68,8 +69,8 @@ def export_openid_keys(keystore, keypasswd, alias, export_file):
     cmd = " ".join([
         "java",
         "-Dlog4j.defaultInitOverride=true",
-        "-cp /app/javalibs/janssen-client.jar",
-        "org.gluu.oxauth.util.KeyExporter",
+        "-cp /app/javalibs/*",
+        "io.jans.as.client.util.KeyExporter",
         "-keystore {}".format(keystore),
         "-keypasswd {}".format(keypasswd),
         "-alias {}".format(alias),
@@ -370,7 +371,7 @@ class CtxGenerator:
         with open(passport_rs_client_jks_fn, "rb") as fr:
             self.set_secret(
                 "passport_rs_jks_base64",
-                encode_text(fr.read(), encoded_salt)
+                encode_text(fr.read(), encoded_salt),
             )
         self.set_config("passport_resource_id", "1504.{}".format(uuid.uuid4()))
 
@@ -449,13 +450,13 @@ class CtxGenerator:
         with open(passportSpTLSCert) as f:
             self.set_secret(
                 "passport_sp_cert_base64",
-                encode_text(f.read(), encoded_salt)
+                encode_text(f.read(), encoded_salt),
             )
 
         with open(passportSpTLSKey) as f:
             self.set_secret(
                 "passport_sp_key_base64",
-                encode_text(f.read(), encoded_salt)
+                encode_text(f.read(), encoded_salt),
             )
 
     def nginx_ctx(self):
@@ -483,7 +484,7 @@ class CtxGenerator:
 
             logger.warning(
                 f"Unable to find mounted {ssl_cert} and {ssl_key}; "
-                f"trying to download from {addr}:443 (servername {servername})"
+                f"trying to download from {addr}:443 (servername {servername})"  # noqa: C812
             )
             try:
                 # cert will be downloaded into `ssl_cert` path
@@ -537,7 +538,7 @@ class CtxGenerator:
         shibJksPass = self.set_secret("shibJksPass", get_random_chars())  # noqa: N806
         self.set_secret(
             "encoded_shib_jks_pw",
-            encode_text(shibJksPass, encoded_salt)
+            encode_text(shibJksPass, encoded_salt),
         )
 
         generate_ssl_certkey(
@@ -556,19 +557,19 @@ class CtxGenerator:
         with open("/etc/certs/shibIDP.crt") as f:
             self.set_secret(
                 "shibIDP_cert",
-                encode_text(f.read(), encoded_salt)
+                encode_text(f.read(), encoded_salt),
             )
 
         with open("/etc/certs/shibIDP.key") as f:
             self.set_secret(
                 "shibIDP_key",
-                encode_text(f.read(), encoded_salt)
+                encode_text(f.read(), encoded_salt),
             )
 
         with open(shibJksFn, "rb") as f:
             self.set_secret(
                 "shibIDP_jks_base64",
-                encode_text(f.read(), encoded_salt)
+                encode_text(f.read(), encoded_salt),
             )
 
         self.set_config("shibboleth_version", "v3")
@@ -624,13 +625,13 @@ class CtxGenerator:
         with open("/etc/certs/sealer.jks", "rb") as f:
             self.set_secret(
                 "sealer_jks_base64",
-                encode_text(f.read(), encoded_salt)
+                encode_text(f.read(), encoded_salt),
             )
 
         with open("/etc/certs/sealer.kver") as f:
             self.set_secret(
                 "sealer_kver_base64",
-                encode_text(f.read(), encoded_salt)
+                encode_text(f.read(), encoded_salt),
             )
 
     def oxtrust_api_rs_ctx(self):
@@ -671,7 +672,7 @@ class CtxGenerator:
         with open(api_rs_client_jks_fn, "rb") as fr:
             self.set_secret(
                 "api_rs_jks_base64",
-                encode_text(fr.read(), encoded_salt)
+                encode_text(fr.read(), encoded_salt),
             )
 
     def oxtrust_api_rp_ctx(self):
@@ -701,7 +702,7 @@ class CtxGenerator:
         with open(api_rp_client_jks_fn, "rb") as fr:
             self.set_secret(
                 "api_rp_jks_base64",
-                encode_text(fr.read(), encoded_salt)
+                encode_text(fr.read(), encoded_salt),
             )
 
     def oxtrust_api_client_ctx(self):
@@ -741,7 +742,7 @@ class CtxGenerator:
         with open("/etc/certs/jans-radius.jks", "rb") as fr:
             self.set_secret(
                 "radius_jks_base64",
-                encode_text(fr.read(), encoded_salt)
+                encode_text(fr.read(), encoded_salt),
             )
 
         basedir, fn = os.path.split("/etc/certs/jans-radius.keys")
