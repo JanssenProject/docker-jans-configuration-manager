@@ -11,34 +11,34 @@ For bleeding-edge/unstable version, use `janssenproject/configuration-manager:5.
 
 The following environment variables are supported by the container:
 
-- `CLOUD_NATIVE_CONFIG_ADAPTER`: The config backend adapter, can be `consul` (default) or `kubernetes`.
-- `CLOUD_NATIVE_CONFIG_CONSUL_HOST`: hostname or IP of Consul (default to `localhost`).
-- `CLOUD_NATIVE_CONFIG_CONSUL_PORT`: port of Consul (default to `8500`).
-- `CLOUD_NATIVE_CONFIG_CONSUL_CONSISTENCY`: Consul consistency mode (choose one of `default`, `consistent`, or `stale`). Default to `stale` mode.
-- `CLOUD_NATIVE_CONFIG_CONSUL_SCHEME`: supported Consul scheme (`http` or `https`).
-- `CLOUD_NATIVE_CONFIG_CONSUL_VERIFY`: whether to verify cert or not (default to `false`).
-- `CLOUD_NATIVE_CONFIG_CONSUL_CACERT_FILE`: path to Consul CA cert file (default to `/etc/certs/consul_ca.crt`). This file will be used if it exists and `CLOUD_NATIVE_CONFIG_CONSUL_VERIFY` set to `true`.
-- `CLOUD_NATIVE_CONFIG_CONSUL_CERT_FILE`: path to Consul cert file (default to `/etc/certs/consul_client.crt`).
-- `CLOUD_NATIVE_CONFIG_CONSUL_KEY_FILE`: path to Consul key file (default to `/etc/certs/consul_client.key`).
-- `CLOUD_NATIVE_CONFIG_CONSUL_TOKEN_FILE`: path to file contains ACL token (default to `/etc/certs/consul_token`).
-- `CLOUD_NATIVE_CONFIG_KUBERNETES_NAMESPACE`: Kubernetes namespace (default to `default`).
-- `CLOUD_NATIVE_CONFIG_KUBERNETES_CONFIGMAP`: Kubernetes configmaps name (default to `janssen`).
-- `CLOUD_NATIVE_CONFIG_KUBERNETES_USE_KUBE_CONFIG`: Load credentials from `$HOME/.kube/config`, only useful for non-container environment (default to `false`).
-- `CLOUD_NATIVE_SECRET_ADAPTER`: The secrets adapter, can be `vault` or `kubernetes`.
-- `CLOUD_NATIVE_SECRET_VAULT_SCHEME`: supported Vault scheme (`http` or `https`).
-- `CLOUD_NATIVE_SECRET_VAULT_HOST`: hostname or IP of Vault (default to `localhost`).
-- `CLOUD_NATIVE_SECRET_VAULT_PORT`: port of Vault (default to `8200`).
-- `CLOUD_NATIVE_SECRET_VAULT_VERIFY`: whether to verify cert or not (default to `false`).
-- `CLOUD_NATIVE_SECRET_VAULT_ROLE_ID_FILE`: path to file contains Vault AppRole role ID (default to `/etc/certs/vault_role_id`).
-- `CLOUD_NATIVE_SECRET_VAULT_SECRET_ID_FILE`: path to file contains Vault AppRole secret ID (default to `/etc/certs/vault_secret_id`).
-- `CLOUD_NATIVE_SECRET_VAULT_CERT_FILE`: path to Vault cert file (default to `/etc/certs/vault_client.crt`).
-- `CLOUD_NATIVE_SECRET_VAULT_KEY_FILE`: path to Vault key file (default to `/etc/certs/vault_client.key`).
-- `CLOUD_NATIVE_SECRET_VAULT_CACERT_FILE`: path to Vault CA cert file (default to `/etc/certs/vault_ca.crt`). This file will be used if it exists and `CLOUD_NATIVE_SECRET_VAULT_VERIFY` set to `true`.
-- `CLOUD_NATIVE_SECRET_KUBERNETES_NAMESPACE`: Kubernetes namespace (default to `default`).
-- `CLOUD_NATIVE_SECRET_KUBERNETES_CONFIGMAP`: Kubernetes secrets name (default to `janssen`).
-- `CLOUD_NATIVE_SECRET_KUBERNETES_USE_KUBE_CONFIG`: Load credentials from `$HOME/.kube/config`, only useful for non-container environment (default to `false`).
-- `CLOUD_NATIVE_WAIT_MAX_TIME`: How long the startup "health checks" should run (default to `300` seconds).
-- `CLOUD_NATIVE_WAIT_SLEEP_DURATION`: Delay between startup "health checks" (default to `10` seconds).
+- `CN_CONFIG_ADAPTER`: The config backend adapter, can be `consul` (default) or `kubernetes`.
+- `CN_CONFIG_CONSUL_HOST`: hostname or IP of Consul (default to `localhost`).
+- `CN_CONFIG_CONSUL_PORT`: port of Consul (default to `8500`).
+- `CN_CONFIG_CONSUL_CONSISTENCY`: Consul consistency mode (choose one of `default`, `consistent`, or `stale`). Default to `stale` mode.
+- `CN_CONFIG_CONSUL_SCHEME`: supported Consul scheme (`http` or `https`).
+- `CN_CONFIG_CONSUL_VERIFY`: whether to verify cert or not (default to `false`).
+- `CN_CONFIG_CONSUL_CACERT_FILE`: path to Consul CA cert file (default to `/etc/certs/consul_ca.crt`). This file will be used if it exists and `CN_CONFIG_CONSUL_VERIFY` set to `true`.
+- `CN_CONFIG_CONSUL_CERT_FILE`: path to Consul cert file (default to `/etc/certs/consul_client.crt`).
+- `CN_CONFIG_CONSUL_KEY_FILE`: path to Consul key file (default to `/etc/certs/consul_client.key`).
+- `CN_CONFIG_CONSUL_TOKEN_FILE`: path to file contains ACL token (default to `/etc/certs/consul_token`).
+- `CN_CONFIG_KUBERNETES_NAMESPACE`: Kubernetes namespace (default to `default`).
+- `CN_CONFIG_KUBERNETES_CONFIGMAP`: Kubernetes configmaps name (default to `janssen`).
+- `CN_CONFIG_KUBERNETES_USE_KUBE_CONFIG`: Load credentials from `$HOME/.kube/config`, only useful for non-container environment (default to `false`).
+- `CN_SECRET_ADAPTER`: The secrets adapter, can be `vault` or `kubernetes`.
+- `CN_SECRET_VAULT_SCHEME`: supported Vault scheme (`http` or `https`).
+- `CN_SECRET_VAULT_HOST`: hostname or IP of Vault (default to `localhost`).
+- `CN_SECRET_VAULT_PORT`: port of Vault (default to `8200`).
+- `CN_SECRET_VAULT_VERIFY`: whether to verify cert or not (default to `false`).
+- `CN_SECRET_VAULT_ROLE_ID_FILE`: path to file contains Vault AppRole role ID (default to `/etc/certs/vault_role_id`).
+- `CN_SECRET_VAULT_SECRET_ID_FILE`: path to file contains Vault AppRole secret ID (default to `/etc/certs/vault_secret_id`).
+- `CN_SECRET_VAULT_CERT_FILE`: path to Vault cert file (default to `/etc/certs/vault_client.crt`).
+- `CN_SECRET_VAULT_KEY_FILE`: path to Vault key file (default to `/etc/certs/vault_client.key`).
+- `CN_SECRET_VAULT_CACERT_FILE`: path to Vault CA cert file (default to `/etc/certs/vault_ca.crt`). This file will be used if it exists and `CN_SECRET_VAULT_VERIFY` set to `true`.
+- `CN_SECRET_KUBERNETES_NAMESPACE`: Kubernetes namespace (default to `default`).
+- `CN_SECRET_KUBERNETES_CONFIGMAP`: Kubernetes secrets name (default to `janssen`).
+- `CN_SECRET_KUBERNETES_USE_KUBE_CONFIG`: Load credentials from `$HOME/.kube/config`, only useful for non-container environment (default to `false`).
+- `CN_WAIT_MAX_TIME`: How long the startup "health checks" should run (default to `300` seconds).
+- `CN_WAIT_SLEEP_DURATION`: Delay between startup "health checks" (default to `10` seconds).
 
 ## Commands
 
@@ -74,10 +74,10 @@ The load command can be used either to generate or restore config and secret for
     docker run \
         --rm \
         --network container:consul \
-        -e CLOUD_NATIVE_CONFIG_ADAPTER=consul \
-        -e CLOUD_NATIVE_CONFIG_CONSUL_HOST=consul \
-        -e CLOUD_NATIVE_SECRET_ADAPTER=vault \
-        -e CLOUD_NATIVE_SECRET_VAULT_HOST=vault \
+        -e CN_CONFIG_ADAPTER=consul \
+        -e CN_CONFIG_CONSUL_HOST=consul \
+        -e CN_SECRET_ADAPTER=vault \
+        -e CN_SECRET_VAULT_HOST=vault \
         -v /path/to/host/volume:/app/db \
         -v /path/to/vault_role_id.txt:/etc/certs/vault_role_id \
         -v /path/to/vault_secret_id.txt:/etc/certs/vault_secret_id \
@@ -192,10 +192,10 @@ Please note that to dump this file into the host, mount a volume to the `/app/db
 docker run \
     --rm \
     --network container:consul \
-    -e CLOUD_NATIVE_CONFIG_ADAPTER=consul \
-    -e CLOUD_NATIVE_CONFIG_CONSUL_HOST=consul \
-    -e CLOUD_NATIVE_SECRET_ADAPTER=vault \
-    -e CLOUD_NATIVE_SECRET_VAULT_HOST=vault \
+    -e CN_CONFIG_ADAPTER=consul \
+    -e CN_CONFIG_CONSUL_HOST=consul \
+    -e CN_SECRET_ADAPTER=vault \
+    -e CN_SECRET_VAULT_HOST=vault \
     -v /path/to/host/volume:/app/db \
     -v /path/to/vault_role_id.txt:/etc/certs/vault_role_id \
     -v /path/to/vault_secret_id.txt:/etc/certs/vault_secret_id \
