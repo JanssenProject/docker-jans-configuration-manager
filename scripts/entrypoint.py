@@ -479,8 +479,8 @@ class CtxGenerator:
         # check from mounted files
         if not (ssl_cert_exists and ssl_key_exists):
             # no mounted files, hence download from frontend
-            addr = os.environ.get("JANS_INGRESS_ADDRESS") or hostname
-            servername = os.environ.get("JANS_INGRESS_SERVERNAME") or addr
+            addr = os.environ.get("CLOUD_NATIVE_INGRESS_ADDRESS") or hostname
+            servername = os.environ.get("CLOUD_NATIVE_INGRESS_SERVERNAME") or addr
 
             logger.warning(
                 f"Unable to find mounted {ssl_cert} and {ssl_key}; "
@@ -711,7 +711,7 @@ class CtxGenerator:
 
     def radius_ctx(self):
         encoded_salt = self.get_secret("encoded_salt")
-        namespace = os.environ.get("JANS_NAMESPACE", "jans")
+        namespace = os.environ.get("CLOUD_NATIVE_NAMESPACE", "jans")
         self.set_config(f"{namespace}_radius_client_id", '1701.{}'.format(uuid.uuid4()))
         self.set_secret(
             f"{namespace}_ro_encoded_pw",
