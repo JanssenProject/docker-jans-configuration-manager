@@ -459,7 +459,7 @@ class CtxGenerator:
                 encode_text(f.read(), encoded_salt),
             )
 
-    def nginx_ctx(self):
+    def web_ctx(self):
         ssl_cert = "/etc/certs/web_https.crt"
         ssl_key = "/etc/certs/web_https.key"
         ssl_cert_pass = self.set_secret("ssl_cert_pass", get_random_chars())
@@ -766,20 +766,20 @@ class CtxGenerator:
 
     def generate(self):
         self.base_ctx()
-        self.nginx_ctx()
+        self.web_ctx()
         self.ldap_ctx()
         self.redis_ctx()
         self.oxauth_ctx()
         self.scim_rs_ctx()
         self.scim_rp_ctx()
-        self.passport_rs_ctx()
-        self.passport_rp_ctx()
-        self.passport_sp_ctx()
-        self.oxshibboleth_ctx()
-        self.oxtrust_api_rs_ctx()
-        self.oxtrust_api_rp_ctx()
-        self.oxtrust_api_client_ctx()
-        self.radius_ctx()
+        # self.passport_rs_ctx()
+        # self.passport_rp_ctx()
+        # self.passport_sp_ctx()
+        # self.oxshibboleth_ctx()
+        # self.oxtrust_api_rs_ctx()
+        # self.oxtrust_api_rp_ctx()
+        # self.oxtrust_api_client_ctx()
+        # self.radius_ctx()
         self.scim_client_ctx()
         self.couchbase_ctx()
         self.jackrabbit_ctx()
