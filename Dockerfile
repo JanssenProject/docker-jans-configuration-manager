@@ -119,6 +119,16 @@ LABEL name="configuration-manager" \
 COPY scripts /app/scripts
 RUN mkdir -p /etc/certs /app/db \
     && chmod +x /app/scripts/entrypoint.sh
+# # create non-root user
+RUN adduser -s /bin/sh -D -G root -u 1000 jetty
 
+ # adjust ownership
+RUN chown -R 1000:1000 /tmp \
+    && chown -R 1000:1000 /app/db \
+    && chmod -R g+w /usr/lib/jvm/default-jvm/jre/lib/security/cacerts \
+    && chgrp -R 0 /app/db && chmod -R g=u /app/db \
+    && chgrp -R 0 /tmp && chmod -R g=u /tmp \
+    && chgrp -R 0 /etc/certs && chmod -R g=u /etc/certs
+USER 1000
 ENTRYPOINT ["tini", "-g", "--", "sh", "/app/scripts/entrypoint.sh"]
 CMD ["--help"]
