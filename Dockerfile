@@ -120,7 +120,7 @@ COPY scripts /app/scripts
 RUN mkdir -p /etc/certs /app/db \
     && chmod +x /app/scripts/entrypoint.sh
 # # create non-root user
-RUN adduser -s /bin/sh -D -G root -u 1000 jetty
+RUN adduser -s /bin/sh -D -G root -u 1000 1000
 
  # adjust ownership
 RUN chown -R 1000:1000 /tmp \
