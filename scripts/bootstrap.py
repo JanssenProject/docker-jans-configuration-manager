@@ -173,7 +173,7 @@ class CtxGenerator:
         self.set_config("jetty_base", "/opt/jans/jetty")
         self.set_config("fido2ConfigFolder", "/etc/jans/conf/fido2")
         self.set_config("admin_inum", "{}".format(uuid.uuid4()))
-        self.set_secret("encoded_oxtrust_admin_password", ldap_encode(self.params["admin_pw"]))
+        self.set_secret("encoded_admin_password", ldap_encode(self.params["admin_pw"]))
 
     def ldap_ctx(self):
         encoded_salt = self.get_secret("encoded_salt")
