@@ -18,6 +18,7 @@ from jans.pycloudlib.utils import generate_base64_contents
 from jans.pycloudlib.utils import safe_render
 from jans.pycloudlib.utils import ldap_encode
 from jans.pycloudlib.utils import get_server_certificate
+from jans.pycloudlib.utils import generate_ssl_certkey
 
 from parameter import params_from_file
 from settings import LOGGING_CONFIG
@@ -195,7 +196,7 @@ class CtxGenerator:
 
         generate_ssl_certkey(
             "opendj",
-            self.get_secret("ldap_truststore_pass"),
+            # self.get_secret("ldap_truststore_pass"),
             self.get_config("admin_email"),
             hostname,
             self.get_config("orgName"),
@@ -453,7 +454,8 @@ class CtxGenerator:
 
     def passport_sp_ctx(self):
         encoded_salt = self.get_secret("encoded_salt")
-        passportSpKeyPass = self.set_secret("passportSpKeyPass", get_random_chars())  # noqa: N806
+        # passportSpKeyPass = self.set_secret("passportSpKeyPass", get_random_chars())  # noqa: N806
+        _ = self.set_secret("passportSpKeyPass", get_random_chars())  # noqa: N806
         self.set_config("passportSpTLSCACert", '/etc/certs/passport-sp.pem')
         passportSpTLSCert = self.set_config("passportSpTLSCert", '/etc/certs/passport-sp.crt')  # noqa: N806
         passportSpTLSKey = self.set_config("passportSpTLSKey", '/etc/certs/passport-sp.key')  # noqa: N806
@@ -462,7 +464,7 @@ class CtxGenerator:
 
         generate_ssl_certkey(
             "passport-sp",
-            passportSpKeyPass,
+            # passportSpKeyPass,
             self.get_config("admin_email"),
             self.get_config("hostname"),
             self.get_config("orgName"),
@@ -485,7 +487,8 @@ class CtxGenerator:
     def web_ctx(self):
         ssl_cert = "/etc/certs/web_https.crt"
         ssl_key = "/etc/certs/web_https.key"
-        ssl_cert_pass = self.set_secret("ssl_cert_pass", get_random_chars())
+        # ssl_cert_pass = self.set_secret("ssl_cert_pass", get_random_chars())
+        _ = self.set_secret("ssl_cert_pass", get_random_chars())
 
         # get cert and key (if available) with priorities below:
         #
@@ -529,7 +532,7 @@ class CtxGenerator:
             logger.info(f"Creating self-generated {ssl_cert} and {ssl_key}")
             generate_ssl_certkey(
                 "web_https",
-                ssl_cert_pass,
+                # ssl_cert_pass,
                 self.get_config("admin_email"),
                 hostname,
                 self.get_config("orgName"),
@@ -566,7 +569,7 @@ class CtxGenerator:
 
         generate_ssl_certkey(
             "shibIDP",
-            shibJksPass,
+            # shibJksPass,
             admin_email,
             hostname,
             orgName,
@@ -603,7 +606,7 @@ class CtxGenerator:
 
         generate_ssl_certkey(
             "idp-signing",
-            shibJksPass,
+            # shibJksPass,
             admin_email,
             hostname,
             orgName,
@@ -625,7 +628,7 @@ class CtxGenerator:
 
         generate_ssl_certkey(
             "idp-encryption",
-            shibJksPass,
+            # shibJksPass,
             admin_email,
             hostname,
             orgName,
@@ -811,54 +814,54 @@ class CtxGenerator:
         return self.ctx
 
 
-def generate_ssl_certkey(suffix, passwd, email, hostname, org_name,
-                         country_code, state, city):
-    # create key with password
-    _, err, retcode = exec_cmd(" ".join([
-        "openssl",
-        "genrsa -des3",
-        "-out /etc/certs/{}.key.orig".format(suffix),
-        "-passout pass:'{}' 2048".format(passwd),
-    ]))
-    assert retcode == 0, "Failed to generate SSL key with password; reason={}".format(err)
+# def generate_ssl_certkey(suffix, passwd, email, hostname, org_name,
+#                          country_code, state, city):
+#     # create key with password
+#     _, err, retcode = exec_cmd(" ".join([
+#         "openssl",
+#         "genrsa -des3",
+#         "-out /etc/certs/{}.key.orig".format(suffix),
+#         "-passout pass:'{}' 2048".format(passwd),
+#     ]))
+#     assert retcode == 0, "Failed to generate SSL key with password; reason={}".format(err)
 
-    # create .key
-    _, err, retcode = exec_cmd(" ".join([
-        "openssl",
-        "rsa",
-        "-in /etc/certs/{}.key.orig".format(suffix),
-        "-passin pass:'{}'".format(passwd),
-        "-out /etc/certs/{}.key".format(suffix),
-    ]))
-    assert retcode == 0, "Failed to generate SSL key; reason={}".format(err)
+#     # create .key
+#     _, err, retcode = exec_cmd(" ".join([
+#         "openssl",
+#         "rsa",
+#         "-in /etc/certs/{}.key.orig".format(suffix),
+#         "-passin pass:'{}'".format(passwd),
+#         "-out /etc/certs/{}.key".format(suffix),
+#     ]))
+#     assert retcode == 0, "Failed to generate SSL key; reason={}".format(err)
 
-    # create .csr
-    _, err, retcode = exec_cmd(" ".join([
-        "openssl",
-        "req",
-        "-new",
-        "-key /etc/certs/{}.key".format(suffix),
-        "-out /etc/certs/{}.csr".format(suffix),
-        """-subj /C="{}"/ST="{}"/L="{}"/O="{}"/CN="{}"/emailAddress='{}'""".format(country_code, state, city, org_name, hostname, email),
+#     # create .csr
+#     _, err, retcode = exec_cmd(" ".join([
+#         "openssl",
+#         "req",
+#         "-new",
+#         "-key /etc/certs/{}.key".format(suffix),
+#         "-out /etc/certs/{}.csr".format(suffix),
+#         """-subj /C="{}"/ST="{}"/L="{}"/O="{}"/CN="{}"/emailAddress='{}'""".format(country_code, state, city, org_name, hostname, email),
 
-    ]))
-    assert retcode == 0, "Failed to generate SSL CSR; reason={}".format(err)
+#     ]))
+#     assert retcode == 0, "Failed to generate SSL CSR; reason={}".format(err)
 
-    # create .crt
-    _, err, retcode = exec_cmd(" ".join([
-        "openssl",
-        "x509",
-        "-req",
-        "-days 365",
-        "-in /etc/certs/{}.csr".format(suffix),
-        "-signkey /etc/certs/{}.key".format(suffix),
-        "-out /etc/certs/{}.crt".format(suffix),
-    ]))
-    assert retcode == 0, "Failed to generate SSL cert; reason={}".format(err)
+#     # create .crt
+#     _, err, retcode = exec_cmd(" ".join([
+#         "openssl",
+#         "x509",
+#         "-req",
+#         "-days 365",
+#         "-in /etc/certs/{}.csr".format(suffix),
+#         "-signkey /etc/certs/{}.key".format(suffix),
+#         "-out /etc/certs/{}.crt".format(suffix),
+#     ]))
+#     assert retcode == 0, "Failed to generate SSL cert; reason={}".format(err)
 
-    # return the paths
-    return "/etc/certs/{}.crt".format(suffix), \
-           "/etc/certs/{}.key".format(suffix)
+#     # return the paths
+#     return "/etc/certs/{}.crt".format(suffix), \
+#            "/etc/certs/{}.key".format(suffix)
 
 
 def generate_keystore(suffix, hostname, keypasswd):
