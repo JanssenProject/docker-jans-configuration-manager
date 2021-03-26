@@ -168,13 +168,12 @@ class CtxGenerator:
         self.set_config("city", self.params["city"])
         self.set_config("hostname", self.params["hostname"])
         self.set_config("admin_email", self.params["email"])
-        self.set_config("default_openid_jks_dn_name", "CN=Janssen Auth CA Certificates")
-        self.set_secret("pairwiseCalculationKey", get_sys_random_chars(random.randint(20, 30)))
-        self.set_secret("pairwiseCalculationSalt", get_sys_random_chars(random.randint(20, 30)))
-        self.set_config("jetty_base", "/opt/jans/jetty")
-        self.set_config("fido2ConfigFolder", "/etc/jans/conf/fido2")
+        # self.set_config("jetty_base", "/opt/jans/jetty")
         self.set_config("admin_inum", "{}".format(uuid.uuid4()))
         self.set_secret("encoded_admin_password", ldap_encode(self.params["admin_pw"]))
+
+        opt_scopes = self.params.get("optional_scopes") or []
+        self.set_config("optional_scopes", list(set(opt_scopes)))
 
     def ldap_ctx(self):
         encoded_salt = self.get_secret("encoded_salt")
@@ -240,10 +239,16 @@ class CtxGenerator:
         )
 
     def redis_ctx(self):
+        # TODO: move this to persistence-loader
         self.set_secret("redis_pw", self.params.get("redis_pw", ""))
 
     def auth_ctx(self):
         encoded_salt = self.get_secret("encoded_salt")
+
+        self.set_config("default_openid_jks_dn_name", "CN=Janssen Auth CA Certificates")
+        self.set_secret("pairwiseCalculationKey", get_sys_random_chars(random.randint(20, 30)))
+        self.set_secret("pairwiseCalculationSalt", get_sys_random_chars(random.randint(20, 30)))
+
         self.set_config("auth_client_id", "1001.{}".format(uuid.uuid4()))
         self.set_secret(
             "authClient_encoded_pw",
@@ -663,7 +668,7 @@ class CtxGenerator:
             encode_template(fn, self.ctx, basedir),
         )
 
-    def scim_client_ctx(self):
+    def scim_ctx(self):
         client_id = f"1201.{uuid.uuid4()}"
         self.set_config("scim_client_id", client_id)
 
@@ -673,6 +678,7 @@ class CtxGenerator:
         self.set_secret("scim_client_encoded_pw", client_encoded_pw)
 
     def couchbase_ctx(self):
+        # TODO: move this to persistence-loader?
         self.set_config("couchbaseTrustStoreFn", "/etc/certs/couchbase.pkcs12")
         self.set_secret("couchbase_shib_user_password", get_random_chars())
 
@@ -681,21 +687,38 @@ class CtxGenerator:
         # self.set_secret("jca_pw", "admin")
         pass
 
+    def fido2_ctx(self):
+        # TODO: hardcoded in persistence-loader?
+        self.set_config("fido2ConfigFolder", "/etc/jans/conf/fido2")
+
     def generate(self):
         self.base_ctx()
-        self.web_ctx()
-        self.ldap_ctx()
-        self.redis_ctx()
         self.auth_ctx()
         self.config_api_ctx()
+        self.web_ctx()
+
+        if "ldap" in self.params["optional_scopes"]:
+            self.ldap_ctx()
+
+        if "redis" in self.params["optional_scopes"]:
+            self.redis_ctx()
+
         # self.passport_rs_ctx()
         # self.passport_rp_ctx()
         # self.passport_sp_ctx()
         # self.oxshibboleth_ctx()
         # self.radius_ctx()
-        self.scim_client_ctx()
-        self.couchbase_ctx()
-        self.jackrabbit_ctx()
+
+        if "scim" in self.params["optional_scopes"]:
+            self.scim_ctx()
+
+        if "couchbase" in self.params["optional_scopes"]:
+            self.couchbase_ctx()
+
+        # self.jackrabbit_ctx()
+
+        if "fido2" in self.params["optional_scopes"]:
+            self.fido2_ctx()
 
         # populated config
         return self.ctx
