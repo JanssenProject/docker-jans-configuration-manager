@@ -85,7 +85,7 @@ class ParamSchema(Schema):
 
     @validates_schema
     def validates_fields(self, data, **kwargs):
-        if "ldap" in data["optional_scopes"] or "ldap_pw" in data:
+        if "ldap" in data.get("optional_scopes", []) or "ldap_pw" in data:
             ldap_pw = data.get("ldap_pw")
 
             if not ldap_pw:

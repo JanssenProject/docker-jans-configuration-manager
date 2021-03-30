@@ -719,15 +719,17 @@ class CtxGenerator:
         self.set_config("fido2ConfigFolder", "/etc/jans/conf/fido2")
 
     def generate(self):
+        opt_scopes = self.params.get("optional_scopes", [])
+
         self.base_ctx()
         self.auth_ctx()
         self.config_api_ctx()
         self.web_ctx()
 
-        if "ldap" in self.params["optional_scopes"]:
+        if "ldap" in opt_scopes:
             self.ldap_ctx()
 
-        if "redis" in self.params["optional_scopes"]:
+        if "redis" in opt_scopes:
             self.redis_ctx()
 
         # self.passport_rs_ctx()
@@ -736,15 +738,15 @@ class CtxGenerator:
         # self.oxshibboleth_ctx()
         # self.radius_ctx()
 
-        if "scim" in self.params["optional_scopes"]:
+        if "scim" in opt_scopes:
             self.scim_ctx()
 
-        if "couchbase" in self.params["optional_scopes"]:
+        if "couchbase" in opt_scopes:
             self.couchbase_ctx()
 
         # self.jackrabbit_ctx()
 
-        if "fido2" in self.params["optional_scopes"]:
+        if "fido2" in opt_scopes:
             self.fido2_ctx()
 
         # populated config
