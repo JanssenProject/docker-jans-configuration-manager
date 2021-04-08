@@ -21,6 +21,7 @@ from jans.pycloudlib.utils import ldap_encode
 from jans.pycloudlib.utils import get_server_certificate
 from jans.pycloudlib.utils import generate_ssl_certkey
 from jans.pycloudlib.utils import as_boolean
+from jans.pycloudlib.utils import generate_keystore
 
 from parameter import params_from_file
 from settings import LOGGING_CONFIG
@@ -204,7 +205,7 @@ class CtxGenerator:
         self.set_config("admin_inum", lambda: f"{uuid4()}")
         self.set_secret("encoded_admin_password", partial(ldap_encode, self.params["admin_pw"]))
 
-        opt_scopes = self.params.get("optional_scopes") or []
+        opt_scopes = self.params["optional_scopes"]
         self.set_config("optional_scopes", list(set(opt_scopes)), False)
 
     def ldap_ctx(self):
@@ -719,7 +720,7 @@ class CtxGenerator:
         self.set_config("fido2ConfigFolder", "/etc/jans/conf/fido2")
 
     def generate(self):
-        opt_scopes = self.params.get("optional_scopes", [])
+        opt_scopes = self.params["optional_scopes"]
 
         self.base_ctx()
         self.auth_ctx()
@@ -751,38 +752,6 @@ class CtxGenerator:
 
         # populated config
         return self.ctx
-
-
-def generate_keystore(suffix, hostname, keypasswd):
-    # converts key to pkcs12
-    cmd = " ".join([
-        "openssl",
-        "pkcs12",
-        "-export",
-        "-inkey /etc/certs/{}.key".format(suffix),
-        "-in /etc/certs/{}.crt".format(suffix),
-        "-out /etc/certs/{}.pkcs12".format(suffix),
-        "-name {}".format(hostname),
-        "-passout pass:'{}'".format(keypasswd),
-    ])
-    _, err, retcode = exec_cmd(cmd)
-    assert retcode == 0, "Failed to generate PKCS12 keystore; reason={}".format(err)
-
-    # imports p12 to keystore
-    cmd = " ".join([
-        "keytool",
-        "-importkeystore",
-        "-srckeystore /etc/certs/{}.pkcs12".format(suffix),
-        "-srcstorepass {}".format(keypasswd),
-        "-srcstoretype PKCS12",
-        "-destkeystore /etc/certs/{}.jks".format(suffix),
-        "-deststorepass {}".format(keypasswd),
-        "-deststoretype JKS",
-        "-keyalg RSA",
-        "-noprompt",
-    ])
-    _, err, retcode = exec_cmd(cmd)
-    assert retcode == 0, "Failed to generate JKS keystore; reason={}".format(err)
 
 
 def gen_idp3_key(storepass):
