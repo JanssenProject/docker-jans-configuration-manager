@@ -49,6 +49,7 @@ class ParamSchema(Schema):
                 error="Non-uppercased characters aren't allowed",
             ),
         ],
+        required=True,
     )
 
     email = Email(required=True)
@@ -63,10 +64,11 @@ class ParamSchema(Schema):
     optional_scopes = List(
         Str(),
         validate=ContainsOnly(OPTIONAL_SCOPES),
+        missing=[],
     )
 
-    # see validate_fields for validation
-    ldap_pw = Str()
+    # see validate_ldap_pw for validation
+    ldap_pw = Str(missing="", default="")
 
     @validates("hostname")
     def validate_fqdn(self, value):
@@ -84,15 +86,10 @@ class ParamSchema(Schema):
             )
 
     @validates_schema
-    def validates_fields(self, data, **kwargs):
-        if "ldap" in data.get("optional_scopes", []) or "ldap_pw" in data:
-            ldap_pw = data.get("ldap_pw")
-
-            if not ldap_pw:
-                raise ValidationError({"ldap_pw": ["Missing data for required field."]})
-
+    def validate_ldap_pw(self, data, **kwargs):
+        if "ldap" in data["optional_scopes"]:
             try:
-                self.validate_password(ldap_pw)
+                self.validate_password(data["ldap_pw"])
             except ValidationError as exc:
                 raise ValidationError({"ldap_pw": exc.messages})
 
